@@ -199,8 +199,11 @@ button:focus { outline: none; }
 .stat-number { font-size:1.25rem; font-weight:700; color: var(--neon-cyan); }
     .stat-number { font-size:2rem; font-weight:800; color: var(--neon-cyan); }
 .stat-label { font-size:0.85rem; color: var(--text-secondary); margin-top:6px; }
-.social-visual { position:relative; height:500px; width:700px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,0.04); border-radius:24px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
-.social-visual::before { content:''; position:absolute; top:-20%; left:-10%; width:140%; height:140%; background: radial-gradient(circle at 30% 30%, rgba(79,172,254,0.18), transparent 30%), radial-gradient(circle at 70% 70%, rgba(240,147,251,0.12), transparent 30%); filter: blur(40px); opacity:0.9; transform: translateZ(0); }
+    .social-visual { position:relative; width:100%; max-width:700px; /* responsive container */
+        aspect-ratio: 14/10; /* preserve visual ratio (700x500) */
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,0.04); border-radius:24px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+    .social-visual::before { content:''; position:absolute; top:-20%; left:-10%; width:140%; height:140%; background: radial-gradient(circle at 30% 30%, rgba(79,172,254,0.18), transparent 30%), radial-gradient(circle at 70% 70%, rgba(240,147,251,0.12), transparent 30%); filter: blur(40px); opacity:0.9; transform: translateZ(0); }
+    .social-visual img { width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit; }
 .social-icon { font-size:5.5rem; color: var(--neon-pink); position:relative; z-index:2; text-shadow: 0 8px 30px rgba(118,75,162,0.18); }
 @keyframes rotate { 100% { transform: rotate(360deg); } }
 
@@ -217,7 +220,8 @@ button:focus { outline: none; }
     .nav-container { padding: 12px 18px; }
     .nav-menu { display: none; }
     .menu-toggle { display: flex; }
-    .hero-section { flex-direction: column; padding-top: 40px; }
+    /* Move hero content further down on small screens so it feels visually centered in tall viewports */
+    .hero-section { flex-direction: column; padding-top: 140px; }
     .hero-left, .hero-right { flex: none; width:100%; }
     .hero-left { padding: 50px 20px; align-items:center; text-align:center; }
     .hero-title { font-size: 3rem; text-align:center; }
@@ -239,8 +243,9 @@ button:focus { outline: none; }
     body { font-size: 15px; }
     .nav-container { padding: 10px 14px; }
     .logo-container { font-size: 1.4rem; }
-    .hero-section { padding-top: 30px; }
-    .hero-left { padding: 30px 16px; }
+    /* Keep hero slightly lower on very small screens as well */
+    .hero-section { padding-top: 110px; }
+    .hero-left { padding: 48px 16px; }
     .hero-title { font-size: clamp(2rem, 9vw, 3.5rem); }
     .hero-subtitle { font-size: 1rem; }
     .geometric-bg { display: none; }
@@ -248,6 +253,18 @@ button:focus { outline: none; }
     .about-section, .events-section, .schedule-section, .social-section { padding: 80px 20px; }
     .footer { padding: 40px 20px; }
     .cursor, .cursor-follower { display: none !important; }
+}
+
+/* Respect users who prefer reduced motion: disable heavy animations and transitions */
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+    .geo-shape, .team-card, .hexagon-card, .timeline-content, .stat-card { animation: none !important; transition: none !important; }
+    #particles-canvas { display: none !important; }
+}
+
+/* Also hide particles on very small viewports as a fallback */
+@media (max-width: 420px) {
+    #particles-canvas { display: none !important; }
 }
 
 /* Mobile nav open state (class toggled by JS) */
