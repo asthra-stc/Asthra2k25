@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASTHRA 2025 - Mathematical Universe</title>
+    <meta name="theme-color" content="#0f0f23">
+    <!-- Font preconnects to speed up Google Fonts on slow mobile networks -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -31,7 +35,7 @@
                 <a href="https://asthrastc.github.io/Asthra2k24/" class="nav-link">Previous</a>
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSfMDnSdE1jTVk_lWYoyHH0kWGlOLfDjdZ1eO4SLAZ0kV4Ul2w/viewform?usp=dialog" class="nav-cta">Register Now</a>
             </div>
-            <div class="menu-toggle">
+            <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -461,6 +465,18 @@ Thank you.</p>
         // Detect touch devices early so we can reduce effects
         const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
 
+        // Disable / hide the particle canvas on very small screens or touch devices to save CPU/battery
+        let particlesEnabled = true;
+        function updateParticlesEnabled() {
+            particlesEnabled = !isTouch && window.innerWidth >= 420; // conservative threshold
+            if (!particlesEnabled) {
+                canvas.style.display = 'none';
+            } else {
+                canvas.style.display = 'block';
+            }
+        }
+        updateParticlesEnabled();
+
         const particles = [];
         function getParticleCount() {
             if (isTouch) return 16; // keep very low on touch devices
@@ -556,13 +572,16 @@ Thank you.</p>
             }
         });
 
-        initParticles();
-        animateParticles();
+        if (particlesEnabled) {
+            initParticles();
+            animateParticles();
+        }
 
         // Resize canvas and reinitialize particles for the new viewport
         window.addEventListener('resize', () => {
             setCanvasSize();
-            initParticles();
+            updateParticlesEnabled();
+            if (particlesEnabled) initParticles();
         });
 
         // Schedule Tabs
@@ -614,6 +633,8 @@ Thank you.</p>
 
         menuToggle.addEventListener('click', () => {
             navMenu.classList.toggle('open');
+            const expanded = navMenu.classList.contains('open');
+            menuToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
         });
 
         // Scroll Animations
