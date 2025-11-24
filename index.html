@@ -19,7 +19,6 @@
     <nav class="nav-container">
         <div class="nav-wrapper">
             <div class="logo-container">
-                <i class="fas fa-infinity"></i>
                 ASTHRA 2025
             </div>
             <div class="nav-menu">
@@ -51,7 +50,7 @@
             <div class="hero-info">
                 <div class="info-item">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>Dec 5-6, 2025</span>
+                    <span>Dec 4-5, 2025</span>
                 </div>
                 <div class="info-item">
                     <i class="fas fa-map-marker-alt"></i>
@@ -59,7 +58,7 @@
                 </div>
             </div>
             <div class="hero-cta-group">
-                <button class="btn-primary">Explore Events</button>
+                <a href="#events" class="btn-primary">Explore Events</a>
             </div>
         </div>
         <div class="hero-right">
@@ -79,14 +78,14 @@
         </div>
         <div class="about-content">
             <div class="about-text">
-                <p>About Asthra 2024
+                <p>About Asthra 2025<br>
 St. Thomas College, Thrissur, is the oldest Catholic College in Kerala and is the first College to have been established by diocesan clergy in India and is older than all the Universities in Kerala. It was founded as an educational institution in 1889. The department of Mathematics started in the year 1926 and presently offers research in Mathematics along with two UG and one PG courses in Mathematics. The department consistently maintains a high level academic excellence and intends to produce highly qualified and motivated Mathematicians.
 
 The Mathematics Department in STC holds the record for having the largest number of students within the department. With over 10+ professors and 300 students we clearly have a lot of strength. And with that strength comes a lot of talent and capabilities. When it comes to creativity and imagination, we clearly don’t fall short
 
 So We,
 The Department of Mathematics,St Thomas College(Autonomous) Thrissur are proud to present our first ever grand fest 'Asthra 2024' on December 5th and 6th.The fest will be a colourful combination of maths,culture and entertainment and will surely be a one of a kind experience.
-Come join us as we create joy and unforgettable moments.
+Come join us as we create joy and unforgettable moments.<br>
 
 Thank you.</p>
             </div>
@@ -234,8 +233,8 @@ Thank you.</p>
                 <h2 class="section-title">Event Schedule</h2>
             </div>
             <div class="day-tabs">
-                <div class="day-tab active" onclick="showDay('day1', this)">Day 1 - Dec 5</div>
-                    <div class="day-tab" onclick="showDay('day2', this)">Day 2 - Dec 6</div>
+                <div class="day-tab active" onclick="showDay('day1', this)">Day 1 - Dec 4</div>
+                    <div class="day-tab" onclick="showDay('day2', this)">Day 2 - Dec 5</div>
             </div>
             <div class="timeline" id="day1">
                 <div class="timeline-item">
@@ -380,7 +379,7 @@ Thank you.</p>
                 </div>
             </div>
             <div class="social-visual">
-                <img src="https://asthrastc.github.io/Asthra2k24/images/img-asthra/social_drive.jpg" alt="Social Drive Image" class="social-image" width="700" height="500">
+                <img loading="lazy" src="https://asthrastc.github.io/Asthra2k24/images/img-asthra/social_drive.jpg" alt="Social Drive Image" class="social-image" width="700" height="500">
             </div>
         </div>
     </section>
@@ -450,14 +449,27 @@ Thank you.</p>
             }, 100);
         });
 
-        // Particle Background
+        // Particle Background (mobile-optimized)
         const canvas = document.getElementById('particles-canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+
+        // Detect touch devices early so we can reduce effects
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
 
         const particles = [];
-        const particleCount = 100;
+        function getParticleCount() {
+            if (isTouch) return 16; // keep very low on touch devices
+            if (window.innerWidth < 480) return 28; // small phones
+            if (window.innerWidth < 900) return 48; // tablets / small screens
+            return 100; // desktop
+        }
+
+        let particleCount = getParticleCount();
 
         class Particle {
             constructor() {
@@ -466,7 +478,7 @@ Thank you.</p>
                 this.size = Math.random() * 2 + 1;
                 this.speedX = Math.random() * 0.5 - 0.25;
                 this.speedY = Math.random() * 0.5 - 0.25;
-                this.color = `hsla(${Math.random() * 60 + 200}, 70%, 50%, 0.8)`;
+                this.color = hsla(${Math.random() * 60 + 200}, 70%, 50%, 0.8);
             }
 
             update() {
@@ -488,44 +500,69 @@ Thank you.</p>
         }
 
         function initParticles() {
+            particles.length = 0;
+            particleCount = getParticleCount();
             for (let i = 0; i < particleCount; i++) {
                 particles.push(new Particle());
             }
         }
 
+        let animationId = null;
         function animateParticles() {
+            // If the tab is hidden, skip rendering to save battery
+            if (document.hidden) {
+                animationId = requestAnimationFrame(animateParticles);
+                return;
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             particles.forEach(particle => {
                 particle.update();
                 particle.draw();
             });
 
-            // Draw connections
-            particles.forEach((a, index) => {
-                particles.slice(index + 1).forEach(b => {
-                    const distance = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-                    if (distance < 100) {
-                        ctx.strokeStyle = `rgba(79, 172, 254, ${1 - distance / 100})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.beginPath();
-                        ctx.moveTo(a.x, a.y);
-                        ctx.lineTo(b.x, b.y);
-                        ctx.stroke();
+            // Draw connections only on non-touch devices and moderate particle counts
+            if (!isTouch && particles.length <= 120) {
+                for (let i = 0; i < particles.length; i++) {
+                    const a = particles[i];
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const b = particles[j];
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 100) {
+                            ctx.strokeStyle = rgba(79, 172, 254, ${1 - distance / 100});
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
                     }
-                });
-            });
+                }
+            }
 
-            requestAnimationFrame(animateParticles);
+            animationId = requestAnimationFrame(animateParticles);
         }
+
+        // Pause/resume when visibility changes to save CPU on mobile
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (animationId) cancelAnimationFrame(animationId);
+                animationId = null;
+            } else {
+                if (!animationId) animateParticles();
+            }
+        });
 
         initParticles();
         animateParticles();
 
-        // Resize canvas
+        // Resize canvas and reinitialize particles for the new viewport
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            setCanvasSize();
+            initParticles();
         });
 
         // Schedule Tabs
@@ -567,7 +604,7 @@ Thank you.</p>
         const navMenu = document.querySelector('.nav-menu');
 
         // If it's a touch device, hide custom cursor and avoid cursor listeners
-        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+        // isTouch is declared earlier near the particle initialization
         if (isTouch) {
             const c = document.querySelector('.cursor');
             const f = document.querySelector('.cursor-follower');
