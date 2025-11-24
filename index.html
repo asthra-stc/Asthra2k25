@@ -438,6 +438,10 @@ Thank you.</p>
         </div>
     </footer>
 
+    <!-- background effects always enabled -->
+    <!-- Mobile-only toggle button (appears on small screens) -->
+    <button id="particles-toggle" aria-pressed="true" aria-label="Toggle background effects">Effects: On</button>
+
     <script>
         // Custom Cursor
         const cursor = document.querySelector('.cursor');
@@ -465,15 +469,12 @@ Thank you.</p>
         // Detect touch devices early so we can reduce effects
         const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
 
-        // Disable / hide the particle canvas on very small screens or touch devices to save CPU/battery
+        // Particles always enabled (unconditional)
         let particlesEnabled = true;
         function updateParticlesEnabled() {
-            particlesEnabled = !isTouch && window.innerWidth >= 420; // conservative threshold
-            if (!particlesEnabled) {
-                canvas.style.display = 'none';
-            } else {
-                canvas.style.display = 'block';
-            }
+            particlesEnabled = true;
+            canvas.style.display = 'block';
+            if (particlesEnabled && particles.length === 0) initParticles();
         }
         updateParticlesEnabled();
 
@@ -583,6 +584,48 @@ Thank you.</p>
             updateParticlesEnabled();
             if (particlesEnabled) initParticles();
         });
+
+        // Toggle UI for mobile: allow users to enable/disable particles
+        (function() {
+            const toggle = document.getElementById('particles-toggle');
+            const PREF_KEY = 'particlesEnabled';
+
+            if (!toggle) return;
+
+            function applyParticlesState(enabled) {
+                if (enabled) {
+                    document.body.classList.add('force-particles');
+                    canvas.style.display = 'block';
+                    if (particles.length === 0) initParticles();
+                    if (!animationId) animateParticles();
+                    toggle.setAttribute('aria-pressed', 'true');
+                    toggle.textContent = 'Effects: On';
+                } else {
+                    document.body.classList.remove('force-particles');
+                    if (animationId) cancelAnimationFrame(animationId);
+                    animationId = null;
+                    particles.length = 0;
+                    canvas.style.display = 'none';
+                    toggle.setAttribute('aria-pressed', 'false');
+                    toggle.textContent = 'Effects: Off';
+                }
+            }
+
+            // Initialize from saved preference; default to true (particles on)
+            const saved = localStorage.getItem(PREF_KEY);
+            const initial = (saved === null) ? true : (saved === 'true');
+            applyParticlesState(initial);
+
+            // Wire up click
+            toggle.addEventListener('click', () => {
+                const current = toggle.getAttribute('aria-pressed') === 'true';
+                const next = !current;
+                localStorage.setItem(PREF_KEY, String(next));
+                applyParticlesState(next);
+            });
+
+            // Ensure the toggle is visible on first load for mobile users (CSS controls visibility)
+        })();
 
         // Schedule Tabs
         function showDay(dayId, el) {
