@@ -264,3 +264,79 @@ button:focus { outline: none; }
     gap: 16px;
     z-index: 1001;
 }
+/* ======== RESPONSIVE FIXES (REPLACE OLD MEDIA QUERIES) ======== */
+
+/* 💠 GLOBAL SCALING FIX */
+html, body {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* 🌐 MAKE NAV ALWAYS ON TOP */
+.nav-container {
+    width: 100%;
+    z-index: 2000;
+}
+
+/* 📌 TABLET VIEW */
+@media (max-width: 1024px) {
+    .about-content { grid-template-columns: 1fr; gap:50px; }
+    .hexagon-grid { grid-template-columns: repeat(2,1fr); }
+    .social-container { grid-template-columns: 1fr; }
+    .footer-content { grid-template-columns: repeat(2,1fr); }
+    .nav-menu { gap: 20px; }
+}
+
+/* 📱 MOBILE VIEW */
+@media (max-width: 768px) {
+    /* Navigation */
+    .nav-container { padding: 12px 18px; }
+    .nav-menu { display: none; }
+    .menu-toggle { display: flex; }
+    .logo-container { font-size: 1.4rem; }
+
+    /* Hero - Fix center alignment */
+    .hero-section { flex-direction: column; padding-top: 100px; text-align: center; }
+    .hero-left { padding: 40px 20px; align-items:center; text-align:center; width:100%; }
+    .hero-right { display:none; }
+
+    /* Hexagons */
+    .hexagon-grid { grid-template-columns: 1fr; }
+
+    /* Timeline */
+    .timeline::before { display: none; }
+    .timeline-item { flex-direction: column !important; padding: 14px 0 !important; align-items: flex-start !important; }
+    .timeline-content { width: 100%; }
+    .timeline-time { margin-bottom: 10px; }
+    .timeline-dot { display: none; }
+
+    /* Footer */
+    .footer-content { grid-template-columns: 1fr; text-align: center; }
+}
+
+/* 📱 SMALL PHONES */
+@media (max-width: 480px) {
+    body { font-size: 15px; }
+    .hero-title { font-size: clamp(2rem, 9vw, 3.5rem); }
+    .hero-subtitle { font-size: 1rem; }
+    .hero-left { padding: 30px 16px; }
+    .geometric-bg { display: none !important; }
+    .cursor, .cursor-follower { display: none !important; }
+    .footer { padding: 40px 20px; }
+}
+
+/* 📌 Mobile Nav */
+.nav-menu.open {
+    display: flex !important;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    gap: 16px;
+    z-index: 2100;
+}
+
